@@ -1,10 +1,48 @@
 import { signUpSchema } from "../schemas/signUpSchema.js";
+import { signInSchema } from "../schemas/signInSchema.js";
 import { db } from "../db/db.js";
 import { stripHtml } from "string-strip-html";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 
 const signIn = async (req, res) => {
   const { email, password } = req.body;
+
+  const validate = signInSchema.validate(
+    { email, password },
+    { abortEarly: false }
+  );
+
+  if (validate.error) {
+    const error = validate.error.details.map((detail) => detail.message);
+    return res.status(422).send(error);
+  }
+
+  try {
+    const userIsValid = await db.query(
+      `SELECT * FROM users WHERE email = $1;`,
+      [email]
+    );
+    if (userIsValid.rowCount == 0) {
+      return res.status(401).send({ error: "Invalid email or password." });
+    }
+
+    const user = userIsValid.rows[0];
+    const passwordValid = bcrypt.compareSync(password, user.password);
+
+    if (!passwordValid) {
+      return res.status(401).send({ error: "Invalid email or password." });
+    }
+
+    const data = { userId: user.id };
+    const token = jwt.sign(data, process.env.JWT_SECRET, { expiresIn: 7200 });
+
+    return res.status(200).send({ token });
+  } catch (error) {
+    return res.status(422).send(error);
+  }
 };
 
 const signUp = async (req, res) => {
