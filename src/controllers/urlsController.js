@@ -25,4 +25,24 @@ const shortUrl = async (req, res) => {
   }
 };
 
-export { shortUrl };
+const getUrlById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const urlIsValid = await db.query(
+      `SELECT id, "shortUrl", url FROM urls WHERE id = $1;`,
+      [id]
+    );
+    if (!(urlIsValid.rowCount > 0)) {
+      return res
+        .status(404)
+        .send({ error: "This shorten url doesn't exists." });
+    }
+
+    return res.status(200).send(urlIsValid.rows[0]);
+  } catch (error) {
+    return res.status(404).send(error);
+  }
+};
+
+export { shortUrl, getUrlById };
