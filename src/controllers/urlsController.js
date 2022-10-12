@@ -19,6 +19,12 @@ const shortUrl = async (req, res) => {
       `INSERT INTO urls ("userId", "shortUrl", url) VALUES ($1, $2, $3);`,
       [userId, shorted, url]
     );
+    const getUrlById = (
+      await db.query(`SELECT urls.id FROM urls WHERE "shortUrl" = $1;`, [
+        shorted,
+      ])
+    ).rows[0].id;
+    await db.query(`INSERT INTO visits ("urlId") VALUES ($1);`, [getUrlById]);
     return res.status(201).send({ shortUrl: shorted });
   } catch (error) {
     return res.status(422).send(error.detail);
