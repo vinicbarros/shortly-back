@@ -67,14 +67,21 @@ const getRanking = async (req, res) => {
     const ranking = (
       await db.query(
         `
-      SELECT users.id, users.name, 
-      COUNT(j2.id) AS "linksCount", 
-      COALESCE(SUM(j1."visitCount"), 0) AS "visitCount" 
-      FROM users
-      LEFT JOIN urls AS j2 ON users.id = j2."userId"
-      LEFT JOIN visits AS j1 ON j2.id = j1."urlId"
-      GROUP BY users.id, users.name
-      ORDER BY "visitCount" DESC, "linksCount" DESC  LIMIT 10
+        SELECT "userId", name,
+        COUNT ("urlId") AS "linksCount",
+        SUM ("viewCount") AS "visitCount"
+        FROM
+        (
+          SELECT
+          users.id AS "userId", users.name, urls.id AS "urlId",
+          COUNT(urls.id) AS "viewCount"
+          FROM users
+          LEFT JOIN urls ON users.id = urls."userId"
+          LEFT JOIN visits on urls.id = visits."urlId"
+          GROUP BY users.id, urls. id
+        ) AS t1 
+        GROUP BY t1.name, t1."userId"
+        ORDER BY "visitCount" DESC, "linksCount" DESC  LIMIT 10;
       `
       )
     ).rows;
