@@ -1,9 +1,14 @@
 import { Router } from "express";
-import { signIn, signUp } from "../controllers/userController.js";
+import { deleteUrl, shortUrl } from "../controllers/urlsController.js";
+import { myShortsUrl } from "../controllers/userController.js";
+import { auth } from "../middlewares/authorizationMiddleware.js";
+import { schemaMiddleware } from "../middlewares/schemaMiddleware.js";
+import { urlSchema } from "../schemas/urlSchema.js";
 
 const userRouter = Router();
 
-userRouter.post("/signup", signUp);
-userRouter.post("/signin", signIn);
+userRouter.get("/users/me", auth, myShortsUrl);
+userRouter.post("/urls/shorten", auth, schemaMiddleware(urlSchema), shortUrl);
+userRouter.delete("/urls/:id", auth, deleteUrl);
 
 export { userRouter };
