@@ -14,10 +14,7 @@ const openUrl = async (req, res) => {
 
     const url = checkUrl.rows[0];
 
-    await db.query(
-      `UPDATE visits SET "visitCount" = "visitCount" + 1 WHERE "urlId" = $1;`,
-      [url.id]
-    );
+    await db.query(`INSERT INTO visits ("urlId") VALUES ($1);`, [url.id]);
 
     const redirect = url.url;
     return res.redirect(redirect);
@@ -32,17 +29,19 @@ const myShortsUrl = async (req, res) => {
   try {
     const shortenedUrls = await db.query(
       `
-      SELECT urls.id, urls."shortUrl", urls.url, j1."visitCount" FROM urls
-      JOIN visits AS j1 ON urls.id = j1."urlId"
-      JOIN users AS j2 ON urls."userId" = j2.id
-      WHERE j2.id = $1;
+      SELECT urls.id, urls."shortUrl", urls."url", 
+      COUNT(visits.id) FROM urls
+      LEFT JOIN visits ON urls.id = visits."urlId"
+      JOIN users ON urls."userId" = users.id
+      WHERE users.id = $1
+      GROUP BY urls.id, urls."shortUrl", urls."url";
       `,
       [user.id]
     );
     const visitCounter = (
       await db.query(
         `
-        SELECT COALESCE(SUM(visits."visitCount"),0) AS "visitCount" 
+        SELECT COALESCE(COUNT(visits.id), 0) AS "visitCount" 
         FROM visits
         JOIN urls AS j1 ON visits."urlId" = j1.id
         JOIN users AS j2 ON j1."userId" = j2.id
@@ -67,20 +66,12 @@ const getRanking = async (req, res) => {
     const ranking = (
       await db.query(
         `
-        SELECT "userId", name,
-        COUNT ("urlId") AS "linksCount",
-        SUM ("viewCount") AS "visitCount"
-        FROM
-        (
-          SELECT
-          users.id AS "userId", users.name, urls.id AS "urlId",
-          COUNT(urls.id) AS "viewCount"
-          FROM users
-          LEFT JOIN urls ON users.id = urls."userId"
-          LEFT JOIN visits on urls.id = visits."urlId"
-          GROUP BY users.id, urls. id
-        ) AS t1 
-        GROUP BY t1.name, t1."userId"
+        SELECT users.id, users.name, COUNT(DISTINCT j1.id) AS "linksCount",
+        COUNT(j2.id) AS "visitCount"
+        FROM users
+        LEFT JOIN urls AS j1 ON users.id = j1."userId"
+        LEFT JOIN visits AS j2 ON j1.id = j2."urlId"
+        GROUP BY users.id, users.name
         ORDER BY "visitCount" DESC, "linksCount" DESC  LIMIT 10;
       `
       )
