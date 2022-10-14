@@ -1,6 +1,6 @@
 # :shorts: Shortly :shorts:  
 
-A restful api that makes it easier to you shorten your urls! 
+A restful api that makes it easier to you shorten your urls! <br>
 ![GitHub Org's stars](https://img.shields.io/github/stars/camilafernanda?style=social)
 
 <br />
