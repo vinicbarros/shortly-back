@@ -1,6 +1,6 @@
 # :shorts: Shortly :shorts:  
 
-A restful api that makes it easier to you shorten your urls! <br>
+A restful api that makes it easier to you shorten your urls! <br><br>
 ![GitHub Org's stars](https://img.shields.io/github/stars/camilafernanda?style=social)
 
 <br />
@@ -22,6 +22,11 @@ This api helps you to manage your shorten urls and share with your friends! Belo
 - Manage your shortened urls
 - See how mutch your shorten url was visited
 - See a ranking of all people url and how mutch was visited
+<br>
+
+<p align="center">
+<img src="http://img.shields.io/static/v1?label=STATUS&message=%20WORKING&color=GREEN&style=for-the-badge"/>
+</p>
 
 ## Technologies
 The following tools and frameworks were used in the construction of the project:<br>
