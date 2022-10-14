@@ -24,7 +24,7 @@ const signIn = async (req, res) => {
     }
 
     const data = { userId: user.id };
-    const token = jwt.sign(data, process.env.TOKEN_SECRET, { expiresIn: 60 });
+    const token = jwt.sign(data, process.env.TOKEN_SECRET, { expiresIn: 7200 });
 
     await db.query(`INSERT INTO sessions (token) VALUES ($1);`, [token]);
 
