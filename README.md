@@ -1,7 +1,7 @@
 # :shorts: Shortly :shorts:  
 
 A restful api that makes it easier to you shorten your urls! <br><br>
-![GitHub Org's stars](https://img.shields.io/github/stars/vinicbarros/shortly-back?style=social)
+![GitHub Org's stars](https://img.shields.io/github/stars/vinicbarros/shortly-back?style=social) ![GitHub Org's stars](https://img.shields.io/github/followers/vinicbarros?style=social)
 
 <br />
 
