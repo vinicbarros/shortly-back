@@ -54,7 +54,7 @@ const signUp = async (req, res) => {
 
     res.status(201).send({ message: "Account created." });
   } catch (error) {
-    return res.status(422).send(error.message);
+    return res.status(422).send(error);
   }
 };
 

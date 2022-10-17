@@ -14,7 +14,7 @@ const getUserShortenedUrls = async (userId) => {
   return await db.query(
     `
         SELECT urls.id, urls."shortUrl", urls."url", 
-        COUNT(visits.id) FROM urls
+        COUNT(visits.id) AS "visitCount" FROM urls
         LEFT JOIN visits ON urls.id = visits."urlId"
         JOIN users ON urls."userId" = users.id
         WHERE users.id = $1
