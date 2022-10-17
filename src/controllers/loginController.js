@@ -1,17 +1,14 @@
-import { db } from "../db/db.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { userRepository } from "../common/repositories/loginRepository.js";
 dotenv.config();
 
 const signIn = async (req, res) => {
   const { email, password } = res.locals.body;
 
   try {
-    const userIsValid = await db.query(
-      `SELECT * FROM users WHERE email = $1;`,
-      [email]
-    );
+    const userIsValid = await userRepository.getUserByEmail(email);
     if (userIsValid.rowCount == 0) {
       return res.status(401).send({ error: "Invalid email or password." });
     }
@@ -26,7 +23,7 @@ const signIn = async (req, res) => {
     const data = { userId: user.id };
     const token = jwt.sign(data, process.env.TOKEN_SECRET, { expiresIn: 7200 });
 
-    await db.query(`INSERT INTO sessions (token) VALUES ($1);`, [token]);
+    await userRepository.sendToken(token);
 
     return res.status(200).send({ token });
   } catch (error) {
@@ -47,17 +44,14 @@ const signUp = async (req, res) => {
 
   try {
     const emailInUse =
-      (await db.query(`SELECT * FROM users WHERE email = $1;`, [email]))
-        .rowCount > 0;
+      (await userRepository.getUserByEmail(email)).rowCount > 0;
 
     if (emailInUse) {
       return res.status(409).send({ error: "This email is already in use." });
     }
 
-    await db.query(
-      `INSERT INTO users (name, email, password) VALUES ($1, $2, $3);`,
-      [name, email, passwordHash]
-    );
+    await userRepository.insertNewUser(name, email, passwordHash);
+
     res.status(201).send({ message: "Account created." });
   } catch (error) {
     return res.status(422).send(error.message);

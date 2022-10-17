@@ -1,4 +1,5 @@
 import { nanoid } from "nanoid";
+import { urlsRepository } from "../common/urlsRepository.js";
 import { db } from "../db/db.js";
 
 const shortUrl = async (req, res) => {
@@ -7,10 +8,7 @@ const shortUrl = async (req, res) => {
 
   try {
     const shorted = nanoid();
-    await db.query(
-      `INSERT INTO urls ("userId", "shortUrl", url) VALUES ($1, $2, $3);`,
-      [userId, shorted, url]
-    );
+    await urlsRepository.insertNewUrl(userId, shorted, url);
     return res.status(201).send({ shortUrl: shorted });
   } catch (error) {
     return res.status(422).send(error.detail);
@@ -21,17 +19,19 @@ const getUrlById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const urlIsValid = await db.query(
-      `SELECT id, "shortUrl", url FROM urls WHERE id = $1;`,
-      [id]
-    );
-    if (!(urlIsValid.rowCount > 0)) {
+    const urlIsValid = await urlsRepository.getUrlById(id);
+    console.log(urlIsValid);
+    if (urlIsValid.rowCount === 0) {
       return res
         .status(404)
         .send({ error: "This shorten url doesn't exists." });
     }
-
-    return res.status(200).send(urlIsValid.rows[0]);
+    const url = urlIsValid.rows[0];
+    return res.status(200).send({
+      id: url.id,
+      shortUrl: url.shortUrl,
+      url: url.url,
+    });
   } catch (error) {
     return res.status(404).send(error);
   }
@@ -41,7 +41,7 @@ const deleteUrl = async (req, res) => {
   const { id } = req.params;
   const userId = res.locals.data;
 
-  const url = await db.query(`SELECT * FROM urls WHERE id = $1;`, [id]);
+  const url = await urlsRepository.getUrlById(id);
 
   const urlIdIsValid = url.rowCount > 0;
   if (!urlIdIsValid) {
@@ -55,8 +55,7 @@ const deleteUrl = async (req, res) => {
   }
 
   try {
-    await db.query(`DELETE FROM visits WHERE "urlId" = $1;`, [id]);
-    await db.query(`DELETE FROM urls WHERE id = $1;`, [id]);
+    await urlsRepository.deleteUrl(id);
     return res.status(204).send({ message: "Url deleted." });
   } catch (error) {
     return res.status(500).send(error);
