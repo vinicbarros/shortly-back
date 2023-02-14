@@ -1,15 +1,21 @@
-# :shorts: Shortly :shorts:  
+<div align="center"><img src="https://i.imgur.com/n5jQzvr.png"></img></div>
+<hr>
+<h2 align=center>Shortly</h2>
+<h3 align=center>Shorten your urls | Back-End Project</h3>
+<hr>
+<h4 align=center>A restful api that makes it easier to you shorten your urls!</h4>
+<h4 align=center>This repository is just Back-End, you can find the Front-End part in my github profile! </h4>
+<br>
+<div align=center style="display:flex; justify-content: center; gap:5%">
+    <a href="https://github.com/vinicbarros/shortly-back">
+      <img src="./assets/images/databaseImage.png" align="center" />
+  </a>
+</div> 
+<br><br>
 
-A restful api that makes it easier to you shorten your urls! <br><br>
 ![GitHub Org's stars](https://img.shields.io/github/stars/vinicbarros/shortly-back?style=social) ![GitHub Org's stars](https://img.shields.io/github/followers/vinicbarros?style=social)
 
 <br />
-
-<p align="center">
-   <a href="https://github.com/vinicbarros/shortly-back">
-      <img src="./assets/images/databaseImage.png" align="center" />
-  </a>
-</p>
 
 ## About
 
